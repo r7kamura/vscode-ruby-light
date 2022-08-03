@@ -5,6 +5,7 @@ Heavily documented sample code for https://code.visualstudio.com/api/language-ex
 ## Functionality
 
 This Language Server works for plain text file. It has the following language features:
+
 - Completions
 - Diagnostics regenerated on each file change or configuration change
 

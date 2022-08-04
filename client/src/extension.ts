@@ -35,10 +35,19 @@ export function activate(context: ExtensionContext) {
     },
   };
 
-  // Options to control the language client
   const clientOptions: LanguageClientOptions = {
-    // Register the server for plain text documents
-    documentSelector: [{ scheme: "file", language: "plaintext" }],
+    documentSelector: [
+      // "file" is for saved files.
+      {
+        language: "ruby",
+        scheme: "file",
+      },
+      // "untitled" is for new files that have not yet been saved to disk.
+      {
+        language: "ruby",
+        scheme: "untitled",
+      },
+    ],
     synchronize: {
       // Notify the server about file changes to '.clientrc files contained in the workspace
       fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),

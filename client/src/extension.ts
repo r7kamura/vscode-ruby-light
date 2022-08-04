@@ -49,8 +49,8 @@ export function activate(context: ExtensionContext) {
       },
     ],
     synchronize: {
-      // Notify the server about file changes to '.clientrc files contained in the workspace
-      fileEvents: workspace.createFileSystemWatcher("**/.clientrc"),
+      // Notify the server when .ruby-version is changed in the workspace.
+      fileEvents: workspace.createFileSystemWatcher("**/.ruby-version"),
     },
   };
 

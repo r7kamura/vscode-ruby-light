@@ -19,6 +19,10 @@ import {
 
 import { TextDocument } from "vscode-languageserver-textdocument";
 
+import * as Parser from "web-tree-sitter";
+import * as path from "path";
+import documentHighlightProvider from "./documentHighlightProvider";
+
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
 const connection = createConnection(ProposedFeatures.all);
@@ -30,7 +34,9 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasDiagnosticRelatedInformationCapability = false;
 
-connection.onInitialize((params: InitializeParams) => {
+let treeSitterParser: Parser;
+
+connection.onInitialize(async (params: InitializeParams) => {
   const capabilities = params.capabilities;
 
   // Does the client support the `workspace/configuration` request?
@@ -47,6 +53,15 @@ connection.onInitialize((params: InitializeParams) => {
     capabilities.textDocument.publishDiagnostics.relatedInformation
   );
 
+  await Parser.init();
+  treeSitterParser = new Parser();
+  const treeSitterRubyWasmPath = path.resolve(
+    __dirname,
+    "tree-sitter-ruby.wasm"
+  );
+  const treeSitterLanguage = await Parser.Language.load(treeSitterRubyWasmPath);
+  treeSitterParser.setLanguage(treeSitterLanguage);
+
   const result: InitializeResult = {
     capabilities: {
       textDocumentSync: TextDocumentSyncKind.Incremental,
@@ -54,6 +69,7 @@ connection.onInitialize((params: InitializeParams) => {
       completionProvider: {
         resolveProvider: true,
       },
+      documentHighlightProvider: true,
     },
   };
   if (hasWorkspaceFolderCapability) {
@@ -79,6 +95,10 @@ connection.onInitialized(() => {
       connection.console.log("Workspace folder change event received.");
     });
   }
+
+  connection.onDocumentHighlight((params) => {
+    return documentHighlightProvider(treeSitterParser, documents, params);
+  });
 });
 
 // The example settings

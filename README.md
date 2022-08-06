@@ -7,6 +7,7 @@ Visual Studio Code extension for Ruby.
 ## Features
 
 - Document Highlight
+- Selection Ranges
 
 ## Development
 

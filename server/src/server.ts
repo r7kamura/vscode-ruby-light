@@ -9,6 +9,7 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import * as Parser from "web-tree-sitter";
 import * as path from "path";
 import documentHighlightProvider from "./documentHighlightProvider";
+import selectionRangesProvider from "./selectionRangesProvider";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -27,6 +28,7 @@ connection.onInitialize(async (_params: InitializeParams) => {
   return {
     capabilities: {
       documentHighlightProvider: true,
+      selectionRangeProvider: true,
       textDocumentSync: TextDocumentSyncKind.Incremental,
     },
   };
@@ -35,6 +37,10 @@ connection.onInitialize(async (_params: InitializeParams) => {
 connection.onInitialized(() => {
   connection.onDocumentHighlight((params) => {
     return documentHighlightProvider(treeSitterParser, documents, params);
+  });
+
+  connection.onSelectionRanges((params) => {
+    return selectionRangesProvider(treeSitterParser, documents, params);
   });
 });
 

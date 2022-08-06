@@ -14,17 +14,15 @@ const connection = createConnection(ProposedFeatures.all);
 
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
 
+const TREE_SITTER_RUBY_WASM_PATH = path.resolve(
+  __dirname,
+  "tree-sitter-ruby.wasm"
+);
+
 let treeSitterParser: Parser;
 
 connection.onInitialize(async (_params: InitializeParams) => {
-  await Parser.init();
-  treeSitterParser = new Parser();
-  const treeSitterRubyWasmPath = path.resolve(
-    __dirname,
-    "tree-sitter-ruby.wasm"
-  );
-  const treeSitterLanguage = await Parser.Language.load(treeSitterRubyWasmPath);
-  treeSitterParser.setLanguage(treeSitterLanguage);
+  await initializeParser();
 
   return {
     capabilities: {
@@ -43,3 +41,12 @@ connection.onInitialized(() => {
 documents.listen(connection);
 
 connection.listen();
+
+async function initializeParser() {
+  await Parser.init();
+  treeSitterParser = new Parser();
+  const treeSitterLanguage = await Parser.Language.load(
+    TREE_SITTER_RUBY_WASM_PATH
+  );
+  treeSitterParser.setLanguage(treeSitterLanguage);
+}

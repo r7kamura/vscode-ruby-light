@@ -1,5 +1,5 @@
 import * as path from "path";
-import { workspace, ExtensionContext } from "vscode";
+import { ExtensionContext } from "vscode";
 
 import {
   LanguageClient,
@@ -52,9 +52,5 @@ function createClientOptions(): LanguageClientOptions {
         scheme: "untitled",
       },
     ],
-    synchronize: {
-      // Notify the server when .ruby-version is changed in the workspace.
-      fileEvents: workspace.createFileSystemWatcher("**/.ruby-version"),
-    },
   };
 }

@@ -51,3 +51,10 @@ code .
 ```
 
 See the [official docs](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for more details.
+
+### Local installation
+
+```
+npx vsce package
+code --install-extension vscode-ruby-light-0.0.1.vsix
+```

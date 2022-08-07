@@ -179,7 +179,10 @@ function keywordNodesForElsifNode(
   } else if (elsifNode.lastChild?.type == "else") {
     keywordNodes.push(elsifNode.lastChild!.firstChild!);
   }
-  if (elsifNode.children[2]?.type == "then") {
+  if (
+    elsifNode.children[2]?.type == "then" &&
+    elsifNode.children[2]?.firstChild?.type == "then"
+  ) {
     keywordNodes.push(elsifNode.children[2].firstChild!);
   }
   return keywordNodes;

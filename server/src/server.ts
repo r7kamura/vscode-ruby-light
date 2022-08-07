@@ -6,21 +6,14 @@ import {
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import * as Parser from "web-tree-sitter";
-import * as path from "path";
+import { initializeParser, parse } from "./parser";
 import documentHighlightProvider from "./documentHighlightProvider";
 import selectionRangesProvider from "./selectionRangesProvider";
+import Position from "./Position";
 
 const connection = createConnection(ProposedFeatures.all);
 
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
-
-const TREE_SITTER_RUBY_WASM_PATH = path.resolve(
-  __dirname,
-  "tree-sitter-ruby.wasm"
-);
-
-let treeSitterParser: Parser;
 
 connection.onInitialize(async (_params: InitializeParams) => {
   await initializeParser();
@@ -35,24 +28,31 @@ connection.onInitialize(async (_params: InitializeParams) => {
 });
 
 connection.onInitialized(() => {
-  connection.onDocumentHighlight((params) => {
-    return documentHighlightProvider(treeSitterParser, documents, params);
+  connection.onDocumentHighlight(({ position, textDocument }) => {
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return [];
+    }
+
+    return documentHighlightProvider(
+      parse(document.getText()),
+      Position.fromVscodePosition(position)
+    );
   });
 
-  connection.onSelectionRanges((params) => {
-    return selectionRangesProvider(treeSitterParser, documents, params);
+  connection.onSelectionRanges(({ positions, textDocument }) => {
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return [];
+    }
+
+    return selectionRangesProvider(
+      parse(document.getText()),
+      positions.map(Position.fromVscodePosition)
+    );
   });
 });
 
 documents.listen(connection);
 
 connection.listen();
-
-async function initializeParser() {
-  await Parser.init();
-  treeSitterParser = new Parser();
-  const treeSitterLanguage = await Parser.Language.load(
-    TREE_SITTER_RUBY_WASM_PATH
-  );
-  treeSitterParser.setLanguage(treeSitterLanguage);
-}

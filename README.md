@@ -22,9 +22,9 @@ For control structures, highlight the corresponding keywords when pointing to th
 
 ![demo](images/selection-ranges.gif)
 
-Select the appropriate range when the "Extend Selection" command is triggered.
+Select the appropriate ranges when the VSCode's "Expand Selection" command is triggered.
 
-This command has a default shortcut assigned to:
+This command has the following shortcut keys assigned by default:
 
-- <kbd>Ctrl + Shift + ArrowRight</kbd> for Mac
-- <kbd>Ctrl + Alt + ArrowRight</kbd> for Windows
+- <kbd>Ctrl + Shift + ArrowRight</kbd> on Mac
+- <kbd>Ctrl + Alt + ArrowRight</kbd> on Windows

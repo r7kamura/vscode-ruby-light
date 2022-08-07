@@ -1,5 +1,5 @@
-out
-node_modules
-client/server
 .vscode-test
+client/server
+node_modules
+out
 server/out/tree-sitter-ruby.wasm

@@ -1,6 +1,6 @@
 {
   "name": "vscode-ruby-light",
-  "displayName": "Ruby",
+  "displayName": "Ruby Light",
   "description": "Lightweight VSCode extension for Ruby.",
   "author": "r7kamura",
   "license": "MIT",

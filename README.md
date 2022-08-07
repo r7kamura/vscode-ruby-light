@@ -19,6 +19,8 @@ For control structures, highlight the corresponding keywords when pointing to th
 
 ### Selection Ranges
 
+![demo](images/selection-ranges.gif)
+
 Select the appropriate range when the "Extend Selection" command is triggered.
 
 This command has a default shortcut assigned to:

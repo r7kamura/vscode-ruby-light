@@ -133,12 +133,10 @@ function highlightsForConditionalNode(
       case "when":
         keywordNodes.push(child.firstChild!);
         break;
-      case "elsif":
-        keywordNodes.push(child.firstChild!);
-        if (child.lastChild?.type == "else") {
-          keywordNodes.push(child.lastChild!.firstChild!);
-        }
+      case "elsif": {
+        keywordNodes.push(...keywordNodesForElsifNode(child));
         break;
+      }
       case "do":
         if (child.firstChild?.type == "do") {
           keywordNodes.push(child.firstChild!);
@@ -152,7 +150,7 @@ function highlightsForConditionalNode(
       case "unless":
         if (
           child.parent?.children[2]?.type === "then" &&
-          child.parent?.children[2]?.firstChild?.type === "else"
+          child.parent?.children[2]?.firstChild?.type === "then"
         ) {
           keywordNodes.push(child.parent.children[2].firstChild!);
         }
@@ -169,6 +167,22 @@ function highlightsForConditionalNode(
     }
   });
   return keywordNodes.map(toHighlight);
+}
+
+function keywordNodesForElsifNode(
+  elsifNode: Parser.SyntaxNode
+): Parser.SyntaxNode[] {
+  const keywordNodes: Parser.SyntaxNode[] = [];
+  keywordNodes.push(elsifNode.firstChild!);
+  if (elsifNode.lastChild?.type == "elsif") {
+    keywordNodes.push(...keywordNodesForElsifNode(elsifNode.lastChild!));
+  } else if (elsifNode.lastChild?.type == "else") {
+    keywordNodes.push(elsifNode.lastChild!.firstChild!);
+  }
+  if (elsifNode.children[2]?.type == "then") {
+    keywordNodes.push(elsifNode.children[2].firstChild!);
+  }
+  return keywordNodes;
 }
 
 function highlightsForRescuableNode(

@@ -3,7 +3,7 @@
 module.exports = {
   root: true,
   parser: "@typescript-eslint/parser",
-  plugins: ["@typescript-eslint", "unused-imports"],
+  plugins: ["@typescript-eslint", "import", "unused-imports"],
   extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended"],
   rules: {
     semi: [2, "always"],
@@ -11,6 +11,7 @@ module.exports = {
     "@typescript-eslint/no-explicit-any": 0,
     "@typescript-eslint/explicit-module-boundary-types": 0,
     "@typescript-eslint/no-non-null-assertion": 0,
+    "import/order": "error",
     "unused-imports/no-unused-imports": "error",
   },
 };

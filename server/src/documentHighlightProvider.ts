@@ -150,13 +150,19 @@ function highlightsForConditionalNode(
     switch (child.type) {
       case "if":
       case "unless":
-        if (child.parent?.children[2]?.type === "then") {
+        if (
+          child.parent?.children[2]?.type === "then" &&
+          child.parent?.children[2]?.firstChild?.type === "else"
+        ) {
           keywordNodes.push(child.parent.children[2].firstChild!);
         }
         break;
       case "elsif":
       case "when":
-        if (child.children[2]?.type === "then") {
+        if (
+          child.children[2]?.type === "then" &&
+          child.children[2]?.firstChild?.type === "then"
+        ) {
           keywordNodes.push(child.children[2].firstChild!);
         }
         break;
@@ -182,7 +188,11 @@ function highlightsForRescuableNode(
         break;
     }
 
-    if (child.type === "rescue" && child.children[3]?.type === "then") {
+    if (
+      child.type === "rescue" &&
+      child.children[3]?.type === "then" &&
+      child.children[3]?.firstChild?.type === "then"
+    ) {
       keywordNodes.push(child.children[3].firstChild!);
     }
   });

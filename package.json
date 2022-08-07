@@ -1,18 +1,19 @@
 {
-  "name": "lsp-sample",
-  "description": "A language server example",
-  "author": "Microsoft Corporation",
+  "name": "vscode-ruby-light",
+  "displayName": "Ruby",
+  "description": "Lightweight VSCode extension for Ruby.",
+  "author": "r7kamura",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Microsoft/vscode-extension-samples"
+    "url": "https://github.com/r7kamura/vscode-ruby-light.git"
   },
-  "publisher": "vscode-samples",
-  "categories": [],
-  "keywords": [
-    "multi-root ready"
+  "extensionKind": [
+    "ui",
+    "workspace"
   ],
+  "publisher": "r7kamura",
   "engines": {
     "vscode": "^1.63.0"
   },
@@ -20,31 +21,7 @@
     "onLanguage:ruby"
   ],
   "main": "./client/out/extension",
-  "contributes": {
-    "configuration": {
-      "type": "object",
-      "title": "Example configuration",
-      "properties": {
-        "languageServerExample.maxNumberOfProblems": {
-          "scope": "resource",
-          "type": "number",
-          "default": 100,
-          "description": "Controls the maximum number of problems produced by the server."
-        },
-        "languageServerExample.trace.server": {
-          "scope": "window",
-          "type": "string",
-          "enum": [
-            "off",
-            "messages",
-            "verbose"
-          ],
-          "default": "off",
-          "description": "Traces the communication between VS Code and the language server."
-        }
-      }
-    }
-  },
+  "contributes": {},
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "npm run compile:tsc && npm run compile:wasm",
@@ -54,8 +31,7 @@
     "lint": "npm run lint:prettier && npm run lint:eslint",
     "lint:prettier": "prettier --write .",
     "lint:eslint": "eslint ./client/src ./server/src --ext .ts,.tsx",
-    "postinstall": "cd client && npm install && cd ../server && npm install && cd ..",
-    "test": "sh ./scripts/e2e.sh"
+    "postinstall": "cd client && npm install && cd ../server && npm install && cd .."
   },
   "devDependencies": {
     "@types/mocha": "^9.1.0",
@@ -63,7 +39,6 @@
     "@typescript-eslint/eslint-plugin": "^5.30.0",
     "@typescript-eslint/parser": "^5.30.0",
     "eslint": "^8.13.0",
-    "mocha": "^9.2.1",
     "prettier": "^2.7.1",
     "tree-sitter-cli": "^0.20.6",
     "tree-sitter-ruby": "^0.19.0",

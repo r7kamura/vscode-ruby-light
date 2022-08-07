@@ -12,8 +12,8 @@ let client: LanguageClient;
 
 export function activate(context: ExtensionContext) {
   new LanguageClient(
-    "ruby-toys",
-    "Ruby Toys",
+    "ruby-light",
+    "Ruby Light",
     createServerOptions(context),
     createClientOptions()
   ).start();

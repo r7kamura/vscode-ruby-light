@@ -6,10 +6,9 @@ Lightweight VSCode extension for Ruby.
 
 ## Features
 
-- Document Highlight
-- Selection Ranges
-
 ### Document Highlight
+
+![demo](images/document-highlight.gif)
 
 For control structures, highlight the corresponding keywords when pointing to them.
 

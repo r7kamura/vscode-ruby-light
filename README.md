@@ -25,6 +25,7 @@ Install NPM dependencies.
 
 ```
 npm install
+npm run compile
 ```
 
 ### Run

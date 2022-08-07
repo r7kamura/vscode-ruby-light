@@ -10,7 +10,6 @@
     "url": "https://github.com/r7kamura/vscode-ruby-light.git"
   },
   "extensionKind": [
-    "ui",
     "workspace"
   ],
   "publisher": "r7kamura",

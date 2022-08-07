@@ -21,15 +21,20 @@ Visual Studio Code extension for Ruby.
 
 ### Set up
 
+Install NPM dependencies.
+
 ```
 npm install
-npm run compile
 ```
 
 ### Run
+
+Launch VSCode workspace
 
 ```
 code .
 ```
 
-and then press <kbd>F5</kbd> on VSCode workspace to a new launch Extension Development Host.
+then press press <kbd>F5</kbd> to launch a new Extension Development Host instance.
+This instance will be started with the extension installed.
+See the [official docs](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for more details.

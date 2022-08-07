@@ -1,6 +1,4 @@
-.vscode-test
-*.vsix
-client/server
-node_modules
-out
-server/out/tree-sitter-ruby.wasm
+/*.vsix
+/client/out/
+/server/out/
+node_modules/

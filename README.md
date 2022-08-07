@@ -4,6 +4,12 @@
 
 Lightweight VSCode extension for Ruby.
 
+## Install
+
+Install via Visual Studio Marketplace:
+
+- [Ruby Light - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=r7kamura.vscode-ruby-light)
+
 ## Features
 
 ### Document Highlight

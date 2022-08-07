@@ -12,10 +12,6 @@ Lightweight VSCode extension for Ruby.
 
 For control structures, highlight the corresponding keywords when pointing to them.
 
-> The document highlight request is sent from the client to the server to resolve a document highlights for a given text document position.
-
-- https://microsoft.github.io/language-server-protocol/specification#textDocument_documentHighlight
-
 ### Selection Ranges
 
 ![demo](images/selection-ranges.gif)
@@ -26,10 +22,6 @@ This command has a default shortcut assigned to:
 
 - <kbd>Ctrl + Shift + ArrowRight</kbd> for Mac
 - <kbd>Ctrl + Alt + ArrowRight</kbd> for Windows
-
-> The selection range request is sent from the client to the server to return suggested selection ranges at an array of given positions.
-
-- https://microsoft.github.io/language-server-protocol/specification#textDocument_selectionRange
 
 ## Development
 

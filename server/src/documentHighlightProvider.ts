@@ -1,9 +1,9 @@
 import {
   DocumentHighlight,
   DocumentHighlightKind,
-  Range,
 } from "vscode-languageserver";
 import Parser = require("web-tree-sitter");
+import { currentNode, toRange } from "./node";
 import Position from "./Position";
 
 export default function documentHighlightProvider(
@@ -11,13 +11,6 @@ export default function documentHighlightProvider(
   position: Position
 ): DocumentHighlight[] {
   return highlights(currentNode(rootNode, position));
-}
-
-function currentNode(
-  rootNode: Parser.SyntaxNode,
-  position: Position
-): Parser.SyntaxNode {
-  return rootNode.descendantForPosition(position.toTreeSitterPosition());
 }
 
 function highlights(node: Parser.SyntaxNode): DocumentHighlight[] {
@@ -204,11 +197,4 @@ function highlightsForRescuableNode(
 
 function toHighlight(node: Parser.SyntaxNode): DocumentHighlight {
   return DocumentHighlight.create(toRange(node), DocumentHighlightKind.Text);
-}
-
-function toRange(node: Parser.SyntaxNode): Range {
-  return Range.create(
-    Position.fromTreeSitterPosition(node.startPosition).toVscodePosition(),
-    Position.fromTreeSitterPosition(node.endPosition).toVscodePosition()
-  );
 }

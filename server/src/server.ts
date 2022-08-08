@@ -10,6 +10,7 @@ import { initializeParser, parse } from "./parser";
 import documentHighlightProvider from "./documentHighlightProvider";
 import selectionRangesProvider from "./selectionRangesProvider";
 import Position from "./Position";
+import { documentSymbolProvider } from "./documentSymbolProvider";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -21,6 +22,7 @@ connection.onInitialize(async (_params: InitializeParams) => {
   return {
     capabilities: {
       documentHighlightProvider: true,
+      documentSymbolProvider: true,
       selectionRangeProvider: true,
       textDocumentSync: TextDocumentSyncKind.Incremental,
     },
@@ -38,6 +40,15 @@ connection.onInitialized(() => {
       parse(document.getText()),
       Position.fromVscodePosition(position)
     );
+  });
+
+  connection.onDocumentSymbol(({ textDocument }) => {
+    const document = documents.get(textDocument.uri);
+    if (!document) {
+      return [];
+    }
+
+    return documentSymbolProvider(parse(document.getText()));
   });
 
   connection.onSelectionRanges(({ positions, textDocument }) => {

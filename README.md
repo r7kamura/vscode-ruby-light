@@ -44,4 +44,4 @@ Select the appropriate ranges when the VSCode's "Expand Selection" command is tr
 This command has the following shortcut keys assigned by default:
 
 - <kbd>Ctrl + Shift + ArrowRight</kbd> on Mac
-- <kbd>Ctrl + Alt + ArrowRight</kbd> on Windows
+- <kbd>Shift + Alt + ArrowRight</kbd> on Windows

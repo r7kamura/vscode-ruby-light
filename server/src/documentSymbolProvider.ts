@@ -150,21 +150,17 @@ class Walker {
       .lastChild!.children.filter((node) => {
         return availableArgumentNodeTypes.has(node.type);
       })
-      .map((node) => {
-        switch (node.type) {
-          case "simple_symbol":
-            return node.text!.slice(1);
-          case "string":
-            return node.text!.slice(1, -1);
-        }
-      })
-      .map((fieldName) => {
+      .map((argumentNode) => {
+        const name =
+          argumentNode.type === "simple_symbol"
+            ? argumentNode.text!.slice(1)
+            : argumentNode.text!.slice(1, -1);
         return {
-          name: fieldName!,
+          name,
           kind: SymbolKind.Field,
           children: [],
           range: toRange(node),
-          selectionRange: toRange(node.firstNamedChild!),
+          selectionRange: toRange(argumentNode),
         };
       });
   }

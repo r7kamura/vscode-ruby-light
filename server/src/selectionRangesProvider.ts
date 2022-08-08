@@ -1,5 +1,6 @@
 import { Range, SelectionRange } from "vscode-languageserver";
 import Parser = require("web-tree-sitter");
+import { currentNode, selfAndAncestors, toRange } from "./node";
 import Position from "./Position";
 
 export default function selectionRangesProvider(
@@ -9,27 +10,6 @@ export default function selectionRangesProvider(
   return positions.map((position) => {
     return toSelectionRange(currentNode(rootNode, position));
   });
-}
-
-function currentNode(
-  rootNode: Parser.SyntaxNode,
-  position: Position
-): Parser.SyntaxNode {
-  return rootNode.descendantForPosition(position.toTreeSitterPosition());
-}
-
-function ancestors(node: Parser.SyntaxNode): Parser.SyntaxNode[] {
-  const ancestors: Parser.SyntaxNode[] = [];
-  let current = node.parent;
-  while (current) {
-    ancestors.push(current);
-    current = current.parent;
-  }
-  return ancestors;
-}
-
-function selfAndAnsestors(node: Parser.SyntaxNode): Parser.SyntaxNode[] {
-  return [node, ...ancestors(node)];
 }
 
 function toRanges(node: Parser.SyntaxNode): Range[] {
@@ -45,7 +25,7 @@ function toRanges(node: Parser.SyntaxNode): Range[] {
     case "argument_list":
       return toArgumentListRanges(node);
     default:
-      return [toOuterRange(node)];
+      return [toRange(node)];
   }
 }
 
@@ -54,7 +34,7 @@ function toDoRanges(node: Parser.SyntaxNode): Range[] {
   if (isDoLessDo(node)) {
     return [];
   } else {
-    return [toOuterRange(node)];
+    return [toRange(node)];
   }
 }
 
@@ -66,7 +46,7 @@ function toDoRanges(node: Parser.SyntaxNode): Range[] {
 //   ^^^^
 function toArgumentListRanges(node: Parser.SyntaxNode): Range[] {
   if (isParenthesesLessArgumentList(node)) {
-    return [toOuterRange(node)];
+    return [toRange(node)];
   } else {
     return toInnerAndOuterRanges(node);
   }
@@ -94,7 +74,7 @@ function toElementReferenceRanges(node: Parser.SyntaxNode): Range[] {
         node.lastChild!.endPosition
       ).toVscodePosition()
     ),
-    toOuterRange(node),
+    toRange(node),
   ];
 }
 
@@ -102,7 +82,7 @@ function toElementReferenceRanges(node: Parser.SyntaxNode): Range[] {
 //    ^^^^^
 // ^^^^^^^^^
 function toInnerAndOuterRanges(node: Parser.SyntaxNode): Range[] {
-  return [toInnerRange(node), toOuterRange(node)];
+  return [toInnerRange(node), toRange(node)];
 }
 
 function toInnerRange(node: Parser.SyntaxNode): Range {
@@ -116,16 +96,9 @@ function toInnerRange(node: Parser.SyntaxNode): Range {
   );
 }
 
-function toOuterRange(node: Parser.SyntaxNode): Range {
-  return Range.create(
-    Position.fromTreeSitterPosition(node.startPosition).toVscodePosition(),
-    Position.fromTreeSitterPosition(node.endPosition).toVscodePosition()
-  );
-}
-
 function toSelectionRange(node: Parser.SyntaxNode): SelectionRange {
   let result: SelectionRange;
-  selfAndAnsestors(node)
+  selfAndAncestors(node)
     .flatMap(toRanges)
     .reverse()
     .forEach((range) => {

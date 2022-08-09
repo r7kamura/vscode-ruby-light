@@ -2,7 +2,11 @@ import * as path from "path";
 import * as Parser from "web-tree-sitter";
 
 export function parse(code: string): Parser.SyntaxNode {
-  return treeSitterParser.parse(code).rootNode;
+  try {
+    return treeSitterParser.parse(code).rootNode;
+  } catch (e) {
+    return treeSitterParser.parse("").rootNode;
+  }
 }
 
 export async function initializeParser() {

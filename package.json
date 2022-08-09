@@ -20,7 +20,38 @@
     "onLanguage:ruby"
   ],
   "main": "./client/out/extension",
-  "contributes": {},
+  "contributes": {
+    "semanticTokenScopes": [
+      {
+        "scopes": {
+          "heredocBeginning": [
+            "punctuation.definition.string.begin.ruby"
+          ],
+          "heredocContent": [
+            "string.unquoted.heredoc.ruby"
+          ],
+          "heredocEnding": [
+            "punctuation.definition.string.end.ruby"
+          ],
+          "metaBrace": [
+            "punctuation.separator.object.ruby",
+            "source.ruby",
+            "meta.embedded"
+          ],
+          "metaComma": [
+            "punctuation.separator.object.ruby",
+            "source.ruby",
+            "meta.embedded"
+          ],
+          "metaDot": [
+            "punctuation.separator.method.ruby",
+            "source.ruby",
+            "meta.embedded"
+          ]
+        }
+      }
+    ]
+  },
   "scripts": {
     "vscode:prepublish": "npm run compile",
     "compile": "npm run compile:tsc && npm run compile:wasm",

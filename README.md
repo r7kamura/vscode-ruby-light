@@ -45,3 +45,7 @@ This command has the following shortcut keys assigned by default:
 
 - <kbd>Ctrl + Shift + ArrowRight</kbd> on Mac
 - <kbd>Shift + Alt + ArrowRight</kbd> on Windows
+
+### Semantic Tokens
+
+Provides more accurate syntax highlighting.

@@ -11,6 +11,11 @@ import documentHighlightProvider from "./documentHighlightProvider";
 import selectionRangesProvider from "./selectionRangesProvider";
 import Position from "./Position";
 import { documentSymbolProvider } from "./documentSymbolProvider";
+import {
+  provideSemanticTokens,
+  semanticTokenModifiers,
+  semanticTokenTypes,
+} from "./semanticTokensProvider";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -24,6 +29,14 @@ connection.onInitialize(async (_params: InitializeParams) => {
       documentHighlightProvider: true,
       documentSymbolProvider: true,
       selectionRangeProvider: true,
+      semanticTokensProvider: {
+        legend: {
+          tokenTypes: semanticTokenTypes,
+          tokenModifiers: semanticTokenModifiers,
+        },
+        range: false,
+        full: true,
+      },
       textDocumentSync: TextDocumentSyncKind.Incremental,
     },
   };
@@ -61,6 +74,11 @@ connection.onInitialized(() => {
       parse(document.getText()),
       positions.map(Position.fromVscodePosition)
     );
+  });
+
+  connection.languages.semanticTokens.on(({ textDocument }) => {
+    const document = documents.get(textDocument.uri);
+    return provideSemanticTokens(parse(document!.getText()));
   });
 });
 

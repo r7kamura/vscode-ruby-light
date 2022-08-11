@@ -1,0 +1,12 @@
+name: release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release:
+    uses: r7kamura/workflows/.github/workflows/vscode-extension-release.yml@main
+    secrets:
+      vsce-token: ${{ secrets.VSCE_TOKEN }}

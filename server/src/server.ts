@@ -30,36 +30,36 @@ connection.onInitialize(async (_params: InitializeParams) => {
 });
 
 connection.onInitialized(() => {
-  connection.onDocumentHighlight(({ position, textDocument }) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
+  connection.onDocumentHighlight((params) => {
+    const textDocument = documents.get(params.textDocument.uri);
+    if (!textDocument) {
       return [];
     }
 
     return documentHighlightProvider(
-      parse(document.getText()),
-      Position.fromVscodePosition(position)
+      parse(textDocument.getText()),
+      Position.fromVscodePosition(params.position)
     );
   });
 
-  connection.onDocumentSymbol(({ textDocument }) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
+  connection.onDocumentSymbol((params) => {
+    const textDocument = documents.get(params.textDocument.uri);
+    if (!textDocument) {
       return [];
     }
 
-    return documentSymbolProvider(parse(document.getText()));
+    return documentSymbolProvider(parse(textDocument.getText()));
   });
 
-  connection.onSelectionRanges(({ positions, textDocument }) => {
-    const document = documents.get(textDocument.uri);
-    if (!document) {
+  connection.onSelectionRanges((params) => {
+    const textDocument = documents.get(params.textDocument.uri);
+    if (!textDocument) {
       return [];
     }
 
     return selectionRangesProvider(
-      parse(document.getText()),
-      positions.map(Position.fromVscodePosition)
+      parse(textDocument.getText()),
+      params.positions.map(Position.fromVscodePosition)
     );
   });
 });

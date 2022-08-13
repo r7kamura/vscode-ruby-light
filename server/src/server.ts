@@ -6,11 +6,17 @@ import {
   TextDocumentSyncKind,
 } from "vscode-languageserver/node";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { initializeParser, parse } from "./parser";
-import documentHighlightProvider from "./documentHighlightProvider";
-import selectionRangesProvider from "./selectionRangesProvider";
-import Position from "./Position";
-import { documentSymbolProvider } from "./documentSymbolProvider";
+import { initializeParser } from "./parser";
+import { documentHighlightRequestHandler } from "./documentHighlight";
+import { selectionRangesRequestHandler } from "./selectionRanges";
+import { documentSymbolRequestHandler } from "./documentSymbol";
+import { codeActionRequestHandler } from "./codeAction";
+import { documentFormattingRequestHandler } from "./documentFormatting";
+import { diagnosticsRequestHandler } from "./diagnostics";
+import {
+  commandIdentifiers,
+  executeCommandRequestHandler,
+} from "./executeCommand";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -21,8 +27,13 @@ connection.onInitialize(async (_params: InitializeParams) => {
 
   return {
     capabilities: {
+      codeActionProvider: true,
+      documentFormattingProvider: true,
       documentHighlightProvider: true,
       documentSymbolProvider: true,
+      executeCommandProvider: {
+        commands: commandIdentifiers,
+      },
       selectionRangeProvider: true,
       textDocumentSync: TextDocumentSyncKind.Incremental,
     },
@@ -30,38 +41,45 @@ connection.onInitialize(async (_params: InitializeParams) => {
 });
 
 connection.onInitialized(() => {
-  connection.onDocumentHighlight((params) => {
-    const textDocument = documents.get(params.textDocument.uri);
-    if (!textDocument) {
-      return [];
+  connection.onDocumentFormatting((params) => {
+    try {
+      return documentFormattingRequestHandler(params, documents);
+    } catch (e) {
+      connection.console.error((e as Error).message);
     }
+  });
 
-    return documentHighlightProvider(
-      parse(textDocument.getText()),
-      Position.fromVscodePosition(params.position)
-    );
+  connection.onDocumentHighlight((params) => {
+    return documentHighlightRequestHandler(params, documents);
   });
 
   connection.onDocumentSymbol((params) => {
-    const textDocument = documents.get(params.textDocument.uri);
-    if (!textDocument) {
-      return [];
-    }
-
-    return documentSymbolProvider(parse(textDocument.getText()));
+    return documentSymbolRequestHandler(params, documents);
   });
 
   connection.onSelectionRanges((params) => {
-    const textDocument = documents.get(params.textDocument.uri);
-    if (!textDocument) {
-      return [];
-    }
-
-    return selectionRangesProvider(
-      parse(textDocument.getText()),
-      params.positions.map(Position.fromVscodePosition)
-    );
+    return selectionRangesRequestHandler(params, documents);
   });
+});
+
+connection.onCodeAction((params) => {
+  return codeActionRequestHandler(params, documents);
+});
+
+connection.onExecuteCommand(async (params) => {
+  try {
+    return await executeCommandRequestHandler(params, documents, connection);
+  } catch (e) {
+    connection.console.error((e as Error).message);
+  }
+});
+
+documents.onDidChangeContent(async (event) => {
+  try {
+    await diagnosticsRequestHandler(event, documents, connection);
+  } catch (e) {
+    connection.console.error((e as Error).message);
+  }
 });
 
 documents.listen(connection);

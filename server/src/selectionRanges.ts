@@ -1,13 +1,26 @@
-import { Range, SelectionRange } from "vscode-languageserver";
+import {
+  Range,
+  SelectionRange,
+  SelectionRangeParams,
+  TextDocuments,
+} from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import Parser = require("web-tree-sitter");
 import { currentNode, selfAndAncestors, toRange } from "./node";
+import { parse } from "./parser";
 import Position from "./Position";
 
-export default function selectionRangesProvider(
-  rootNode: Parser.SyntaxNode,
-  positions: Position[]
-): SelectionRange[] {
-  return positions.map((position) => {
+export function selectionRangesRequestHandler(
+  params: SelectionRangeParams,
+  documents: TextDocuments<TextDocument>
+): SelectionRange[] | undefined {
+  const textDocument = documents.get(params.textDocument.uri);
+  if (!textDocument) {
+    return;
+  }
+
+  const rootNode = parse(textDocument.getText());
+  return params.positions.map(Position.fromVscodePosition).map((position) => {
     return toSelectionRange(currentNode(rootNode, position));
   });
 }

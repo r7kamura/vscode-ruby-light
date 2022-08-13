@@ -1,16 +1,30 @@
 import {
   DocumentHighlight,
   DocumentHighlightKind,
+  DocumentHighlightParams,
+  TextDocuments,
 } from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import Parser = require("web-tree-sitter");
 import { currentNode, toRange } from "./node";
+import { parse } from "./parser";
 import Position from "./Position";
 
-export default function documentHighlightProvider(
-  rootNode: Parser.SyntaxNode,
-  position: Position
-): DocumentHighlight[] {
-  return highlights(currentNode(rootNode, position));
+export function documentHighlightRequestHandler(
+  params: DocumentHighlightParams,
+  documents: TextDocuments<TextDocument>
+): DocumentHighlight[] | undefined {
+  const textDocument = documents.get(params.textDocument.uri);
+  if (!textDocument) {
+    return;
+  }
+
+  return highlights(
+    currentNode(
+      parse(textDocument.getText()),
+      Position.fromVscodePosition(params.position)
+    )
+  );
 }
 
 function highlights(node: Parser.SyntaxNode): DocumentHighlight[] {

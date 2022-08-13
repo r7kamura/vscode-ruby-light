@@ -1,11 +1,24 @@
-import { DocumentSymbol, SymbolKind } from "vscode-languageserver";
+import {
+  DocumentSymbol,
+  DocumentSymbolParams,
+  SymbolKind,
+  TextDocuments,
+} from "vscode-languageserver";
+import { TextDocument } from "vscode-languageserver-textdocument";
 import Parser = require("web-tree-sitter");
 import { selfAndAncestors, toRange } from "./node";
+import { parse } from "./parser";
 
-export function documentSymbolProvider(
-  rootNode: Parser.SyntaxNode
-): DocumentSymbol[] {
-  return new Walker().walk(rootNode);
+export function documentSymbolRequestHandler(
+  params: DocumentSymbolParams,
+  documents: TextDocuments<TextDocument>
+): DocumentSymbol[] | undefined {
+  const textDocument = documents.get(params.textDocument.uri);
+  if (!textDocument) {
+    return;
+  }
+
+  return new Walker().walk(parse(textDocument.getText()));
 }
 
 class Walker {

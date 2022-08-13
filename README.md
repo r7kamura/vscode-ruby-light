@@ -45,3 +45,7 @@ This command has the following shortcut keys assigned by default:
 
 - <kbd>Ctrl + Shift + ArrowRight</kbd> on Mac
 - <kbd>Shift + Alt + ArrowRight</kbd> on Windows
+
+## Acknowledgements
+
+This extension is inspired by [vscode-ruby](https://github.com/rubyide/vscode-ruby).

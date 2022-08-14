@@ -44,7 +44,13 @@ export async function runRuboCopLint({
 }): Promise<Array<RuboCopOffense>> {
   const result = await runCommandWithOrWithoutBundler(
     "rubocop",
-    ["--force-exclusion", "--format", "json", "--stdin", path],
+    [
+      "--force-exclusion",
+      "--format",
+      "json",
+      "--stdin",
+      modifyUntitledPath(path),
+    ],
     code
   );
   if (result.code && result.stderr) {
@@ -62,10 +68,7 @@ export async function runRuboCopAutocorrect({
   copName?: string;
   path: string;
 }): Promise<string> {
-  const args = ["--force-exclusion", "--autocorrect-all", "--stdin"];
-  if (path) {
-    args.push(path);
-  }
+  const args = ["--force-exclusion", "--autocorrect-all", "--stdin", path];
   if (copName) {
     args.push("--only", copName);
   }
@@ -88,4 +91,9 @@ function toOffenses(ruboCopOutput: string): Array<RuboCopOffense> {
 
 function hasRuboCopYml(directory: string): boolean {
   return existsSync(path.join(directory, ".rubocop.yml"));
+}
+
+// To avoid Naming/FileName cop.
+function modifyUntitledPath(path: string): string {
+  return path.replace(/^Untitled-(\d+)$/, "untitled_$1");
 }

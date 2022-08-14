@@ -53,6 +53,12 @@ This extension supports the folowiing types of symbols:
 
 ![demo](images/document-symbol.gif)
 
+### Others
+
+- Add Ruby file extension patterns
+- Add Ruby file name patterns
+- Add indentation rules
+
 ## Configuration
 
 ### `rubyLight.diagnostics.enabled`

@@ -13,6 +13,7 @@ import {
   RuboCopLocation,
   RuboCopOffense,
   RuboCopSeverity,
+  inRuboCopDirectory,
 } from "./rubocop";
 import { Settings } from "./settings";
 
@@ -61,6 +62,10 @@ async function investigateDiagnostics(
   connection: Connection
 ): Promise<Diagnostic[]> {
   if (!settings.diagnostics.enabled) {
+    return [];
+  }
+
+  if (!(await inRuboCopDirectory())) {
     return [];
   }
 

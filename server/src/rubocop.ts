@@ -1,4 +1,12 @@
+import { existsSync } from "fs";
+import path = require("path");
+import { currentOrAncestorDirectories } from "./directory";
 import { runCommandWithOrWithoutBundler } from "./spawn";
+
+export async function inRuboCopDirectory(): Promise<boolean> {
+  const directories = await currentOrAncestorDirectories();
+  return directories.some(hasRuboCopYml);
+}
 
 export type RuboCopOffense = {
   cop_name: string;
@@ -76,4 +84,8 @@ function toCorrectedCode(ruboCopOutput: string): string {
 
 function toOffenses(ruboCopOutput: string): Array<RuboCopOffense> {
   return JSON.parse(ruboCopOutput).files[0].offenses;
+}
+
+function hasRuboCopYml(directory: string): boolean {
+  return existsSync(path.join(directory, ".rubocop.yml"));
 }

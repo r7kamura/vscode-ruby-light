@@ -51,6 +51,38 @@ This extension supports the folowiing types of symbols:
 
 ![demo](images/document-symbol.gif)
 
+## Configuration
+
+### `rubyLight.diagnostics.enabled`
+
+Enable diagnostics.
+
+- default: `true`
+
+### `rubyLight.documentFormatting.enabled`
+
+Enable document formatting.
+
+- default: `true`
+
+### `rubyLight.documentHighlight.enabled`
+
+Enable document highlight.
+
+- default: `true`
+
+### `rubyLight.selectionRanges.enabled`
+
+Enable selection ranges.
+
+- default: `true`
+
+### `rubyLight.documentSymbol.enabled`
+
+Enable document symbol.
+
+- default: `true`
+
 ## Acknowledgements
 
 This extension is inspired by [vscode-ruby](https://github.com/rubyide/vscode-ruby).

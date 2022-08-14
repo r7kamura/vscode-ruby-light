@@ -14,26 +14,80 @@ import {
   RuboCopOffense,
   RuboCopSeverity,
 } from "./rubocop";
+import { Settings } from "./settings";
 
 export async function diagnosticsRequestHandler(
+  settings: Settings,
   event: TextDocumentChangeEvent<TextDocument>,
   documents: TextDocuments<TextDocument>,
   connection: Connection
 ): Promise<void> {
   const uri = event.document.uri;
+  const diagnostics = await investigateDiagnostics(
+    settings,
+    uri,
+    documents,
+    connection
+  );
+  connection.sendDiagnostics({
+    uri,
+    diagnostics,
+  });
+}
+
+export async function refreshAllDocumentsDiagnostics(
+  settings: Settings,
+  documents: TextDocuments<TextDocument>,
+  connection: Connection
+): Promise<void[]> {
+  return Promise.all(
+    documents.all().map((textDocument) => {
+      return diagnosticsRequestHandler(
+        settings,
+        {
+          document: textDocument,
+        },
+        documents,
+        connection
+      );
+    })
+  );
+}
+
+async function investigateDiagnostics(
+  settings: Settings,
+  uri: DocumentUri,
+  documents: TextDocuments<TextDocument>,
+  connection: Connection
+): Promise<Diagnostic[]> {
+  if (!settings.diagnostics.enabled) {
+    return [];
+  }
+
   const textDocument = documents.get(uri);
   if (!textDocument) {
-    return;
+    return [];
   }
 
   const path = URI.parse(uri).fsPath;
-  const offenses = await runRuboCopLint({
-    code: textDocument.getText(),
-    path,
-  });
+  let offenses;
+  try {
+    offenses = await runRuboCopLint({
+      code: textDocument.getText(),
+      path,
+    });
+  } catch (error) {
+    connection.console.error((error as Error).message);
+    return [];
+  }
+
+  return offenses.map((offense) => toVscodeDiagnostic(offense, uri));
+}
+
+function sendEmptyDiagnostics(uri: DocumentUri, connection: Connection) {
   connection.sendDiagnostics({
     uri,
-    diagnostics: offenses.map((offense) => toVscodeDiagnostic(offense, uri)),
+    diagnostics: [],
   });
 }
 

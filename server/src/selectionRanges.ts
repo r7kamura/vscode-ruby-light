@@ -9,11 +9,17 @@ import Parser = require("web-tree-sitter");
 import { currentNode, selfAndAncestors, toRange } from "./node";
 import { parse } from "./parser";
 import Position from "./Position";
+import { Settings } from "./settings";
 
 export function selectionRangesRequestHandler(
+  settings: Settings,
   params: SelectionRangeParams,
   documents: TextDocuments<TextDocument>
 ): SelectionRange[] | undefined {
+  if (!settings.selectionRanges.enabled) {
+    return;
+  }
+
   const textDocument = documents.get(params.textDocument.uri);
   if (!textDocument) {
     return;

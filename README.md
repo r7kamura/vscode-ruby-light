@@ -26,7 +26,7 @@ Run "Format Document" command or enable "Format On Save" in the settings to auto
 
 ### Highlight
 
-For control structures, highlight the corresponding keywords when pointing to them.
+Hover control keywords to highlight the corresponding keywords.
 
 ![demo](images/document-highlight.gif)
 

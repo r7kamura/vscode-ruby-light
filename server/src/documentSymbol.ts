@@ -8,11 +8,17 @@ import { TextDocument } from "vscode-languageserver-textdocument";
 import Parser = require("web-tree-sitter");
 import { selfAndAncestors, toRange } from "./node";
 import { parse } from "./parser";
+import { Settings } from "./settings";
 
 export function documentSymbolRequestHandler(
+  settings: Settings,
   params: DocumentSymbolParams,
   documents: TextDocuments<TextDocument>
 ): DocumentSymbol[] | undefined {
+  if (!settings.documentSymbol.enabled) {
+    return;
+  }
+
   const textDocument = documents.get(params.textDocument.uri);
   if (!textDocument) {
     return;

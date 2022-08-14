@@ -1,5 +1,6 @@
 import {
   createConnection,
+  DidChangeConfigurationNotification,
   InitializeParams,
   ProposedFeatures,
   TextDocuments,
@@ -12,15 +13,21 @@ import { selectionRangesRequestHandler } from "./selectionRanges";
 import { documentSymbolRequestHandler } from "./documentSymbol";
 import { codeActionRequestHandler } from "./codeAction";
 import { documentFormattingRequestHandler } from "./documentFormatting";
-import { diagnosticsRequestHandler } from "./diagnostics";
 import {
   commandIdentifiers,
   executeCommandRequestHandler,
 } from "./executeCommand";
+import { defaultSettings, getSettings, Settings } from "./settings";
+import {
+  diagnosticsRequestHandler,
+  refreshAllDocumentsDiagnostics,
+} from "./diagnostics";
 
 const connection = createConnection(ProposedFeatures.all);
 
 const documents: TextDocuments<TextDocument> = new TextDocuments(TextDocument);
+
+let settings: Settings = defaultSettings;
 
 connection.onInitialize(async (_params: InitializeParams) => {
   await initializeParser();
@@ -40,46 +47,55 @@ connection.onInitialize(async (_params: InitializeParams) => {
   };
 });
 
-connection.onInitialized(() => {
+connection.onInitialized(async () => {
+  settings = await getSettings(connection);
+
+  connection.client.register(DidChangeConfigurationNotification.type);
+
   connection.onDocumentFormatting((params) => {
-    try {
-      return documentFormattingRequestHandler(params, documents);
-    } catch (e) {
-      connection.console.error((e as Error).message);
-    }
+    return documentFormattingRequestHandler(
+      settings,
+      params,
+      documents,
+      connection
+    );
   });
 
   connection.onDocumentHighlight((params) => {
-    return documentHighlightRequestHandler(params, documents);
+    return documentHighlightRequestHandler(settings, params, documents);
   });
 
   connection.onDocumentSymbol((params) => {
-    return documentSymbolRequestHandler(params, documents);
+    return documentSymbolRequestHandler(settings, params, documents);
   });
 
   connection.onSelectionRanges((params) => {
-    return selectionRangesRequestHandler(params, documents);
+    return selectionRangesRequestHandler(settings, params, documents);
   });
+
+  documents.onDidChangeContent(async (event) => {
+    await diagnosticsRequestHandler(settings, event, documents, connection);
+  });
+
+  await refreshAllDocumentsDiagnostics(settings, documents, connection);
 });
 
 connection.onCodeAction((params) => {
-  return codeActionRequestHandler(params, documents);
+  return codeActionRequestHandler(settings, params, documents);
 });
 
 connection.onExecuteCommand(async (params) => {
-  try {
-    return await executeCommandRequestHandler(params, documents, connection);
-  } catch (e) {
-    connection.console.error((e as Error).message);
-  }
+  return await executeCommandRequestHandler(
+    settings,
+    params,
+    documents,
+    connection
+  );
 });
 
-documents.onDidChangeContent(async (event) => {
-  try {
-    await diagnosticsRequestHandler(event, documents, connection);
-  } catch (e) {
-    connection.console.error((e as Error).message);
-  }
+connection.onDidChangeConfiguration(async (_params) => {
+  settings = await getSettings(connection);
+  await refreshAllDocumentsDiagnostics(settings, documents, connection);
 });
 
 documents.listen(connection);

@@ -9,11 +9,17 @@ import Parser = require("web-tree-sitter");
 import { currentNode, toRange } from "./node";
 import { parse } from "./parser";
 import Position from "./Position";
+import { Settings } from "./settings";
 
 export function documentHighlightRequestHandler(
+  settings: Settings,
   params: DocumentHighlightParams,
   documents: TextDocuments<TextDocument>
 ): DocumentHighlight[] | undefined {
+  if (!settings.documentHighlight.enabled) {
+    return;
+  }
+
   const textDocument = documents.get(params.textDocument.uri);
   if (!textDocument) {
     return;

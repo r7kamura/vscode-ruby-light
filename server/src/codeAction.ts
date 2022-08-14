@@ -8,8 +8,10 @@ import {
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { commandIdentifierForAutocorrect } from "./executeCommand";
+import { Settings } from "./settings";
 
 export function codeActionRequestHandler(
+  _settings: Settings,
   params: CodeActionParams,
   documents: TextDocuments<TextDocument>
 ): CodeAction[] | undefined {

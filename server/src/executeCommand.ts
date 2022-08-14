@@ -7,6 +7,7 @@ import {
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
 import { runRuboCopAutocorrect } from "./rubocop";
+import { Settings } from "./settings";
 import { fromDiff } from "./textEdit";
 
 export const commandIdentifierForAutocorrect = "RubyLight.Autocorrect";
@@ -14,13 +15,18 @@ export const commandIdentifierForAutocorrect = "RubyLight.Autocorrect";
 export const commandIdentifiers = [commandIdentifierForAutocorrect];
 
 export async function executeCommandRequestHandler(
+  _settings: Settings,
   params: ExecuteCommandParams,
   documents: TextDocuments<TextDocument>,
   connection: Connection
 ): Promise<void> {
   switch (params.command) {
     case commandIdentifierForAutocorrect:
-      await executeAutocorrect(params, documents, connection);
+      try {
+        await executeAutocorrect(params, documents, connection);
+      } catch (error) {
+        connection.console.error((error as Error).message);
+      }
       break;
   }
 }

@@ -50,7 +50,61 @@
           "default": true
         }
       }
-    }
+    },
+    "languages": [
+      {
+        "id": "ruby",
+        "aliases": [
+          "Ruby",
+          "rb"
+        ],
+        "extensions": [
+          ".arb",
+          ".builder",
+          ".cgi",
+          ".fcgi",
+          ".gemspec",
+          ".god",
+          ".irbrc",
+          ".jbuilder",
+          ".mspec",
+          ".pluginspec",
+          ".podspec",
+          ".prawn",
+          ".pryrc",
+          ".rabl",
+          ".rake",
+          ".rb",
+          ".rbuild",
+          ".rbw",
+          ".rbx",
+          ".rjs",
+          ".ru",
+          ".ruby",
+          ".spec",
+          ".thor",
+          ".watchr"
+        ],
+        "filenames": [
+          "appfile",
+          "appraisals",
+          "berksfile",
+          "brewfile",
+          "capfile",
+          "dangerfile",
+          "deliverfile",
+          "fastfile",
+          "guardfile",
+          "podfile",
+          "puppetfile",
+          "rakefile",
+          "snapfile",
+          "thorfile",
+          "vagrantfile"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

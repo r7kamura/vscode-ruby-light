@@ -39,7 +39,7 @@ export async function runRuboCopLint({
     ["--force-exclusion", "--format", "json", "--stdin", path],
     code
   );
-  if (result.code) {
+  if (result.code && result.stderr) {
     throw new Error(result.stderr);
   }
   return toOffenses(result.stdout);
@@ -62,7 +62,7 @@ export async function runRuboCopAutocorrect({
     args.push("--only", copName);
   }
   const result = await runCommandWithOrWithoutBundler("rubocop", args, code);
-  if (result.code) {
+  if (result.code && result.stderr) {
     throw new Error(result.stderr);
   }
   return toCorrectedCode(result.stdout);

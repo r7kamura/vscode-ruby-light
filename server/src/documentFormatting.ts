@@ -6,7 +6,7 @@ import {
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { runRuboCopAutocorrect } from "./rubocop";
+import { inRuboCopDirectory, runRuboCopAutocorrect } from "./rubocop";
 import { Settings } from "./settings";
 import { fromDiff } from "./textEdit";
 
@@ -17,6 +17,10 @@ export async function documentFormattingRequestHandler(
   connection: Connection
 ): Promise<TextEdit[] | undefined> {
   if (!settings.documentFormatting.enabled) {
+    return;
+  }
+
+  if (!(await inRuboCopDirectory())) {
     return;
   }
 

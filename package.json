@@ -75,6 +75,7 @@
           ".rabl",
           ".rake",
           ".rb",
+          ".rbi",
           ".rbuild",
           ".rbw",
           ".rbx",
@@ -94,6 +95,7 @@
           "dangerfile",
           "deliverfile",
           "fastfile",
+          "gemfile",
           "guardfile",
           "podfile",
           "puppetfile",
@@ -102,6 +104,7 @@
           "thorfile",
           "vagrantfile"
         ],
+        "firstLine": "^#!\\s*/.*\\b(ruby|rbx|rake)\\b",
         "configuration": "./language-configuration.json"
       }
     ]

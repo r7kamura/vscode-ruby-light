@@ -26,27 +26,27 @@
       "properties": {
         "rubyLight.diagnostics.enabled": {
           "type": "boolean",
-          "description": "Enable diagnostics",
+          "description": "Enable diagnostics.",
           "default": true
         },
         "rubyLight.documentFormatting.enabled": {
           "type": "boolean",
-          "description": "Enable document formatting",
+          "description": "Enable document formatting and document range formatting.",
           "default": true
         },
         "rubyLight.documentHighlight.enabled": {
           "type": "boolean",
-          "description": "Enable document highlight",
+          "description": "Enable document highlight.",
           "default": true
         },
         "rubyLight.selectionRanges.enabled": {
           "type": "boolean",
-          "description": "Enable selection ranges",
+          "description": "Enable selection ranges.",
           "default": true
         },
         "rubyLight.documentSymbol.enabled": {
           "type": "boolean",
-          "description": "Enable document symbol",
+          "description": "Enable document symbol.",
           "default": true
         }
       }

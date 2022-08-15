@@ -22,6 +22,7 @@ import {
   diagnosticsRequestHandler,
   refreshAllDocumentsDiagnostics,
 } from "./diagnostics";
+import { documentRangeFormattingRequestHandler } from "./documentRangeFormatting";
 
 const connection = createConnection(ProposedFeatures.all);
 
@@ -38,6 +39,7 @@ connection.onInitialize(async (_params: InitializeParams) => {
       documentFormattingProvider: true,
       documentHighlightProvider: true,
       documentSymbolProvider: true,
+      documentRangeFormattingProvider: true,
       executeCommandProvider: {
         commands: commandIdentifiers,
       },
@@ -63,6 +65,15 @@ connection.onInitialized(async () => {
 
   connection.onDocumentHighlight((params) => {
     return documentHighlightRequestHandler(settings, params, documents);
+  });
+
+  connection.onDocumentRangeFormatting((params) => {
+    return documentRangeFormattingRequestHandler(
+      settings,
+      params,
+      documents,
+      connection
+    );
   });
 
   connection.onDocumentSymbol((params) => {

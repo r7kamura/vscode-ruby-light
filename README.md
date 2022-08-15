@@ -69,7 +69,7 @@ Enable diagnostics.
 
 ### `rubyLight.documentFormatting.enabled`
 
-Enable document formatting.
+Enable document formatting and document range formatting.
 
 - default: `true`
 

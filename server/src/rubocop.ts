@@ -86,7 +86,7 @@ function toCorrectedCode(ruboCopOutput: string): string {
 }
 
 function toOffenses(ruboCopOutput: string): Array<RuboCopOffense> {
-  return JSON.parse(ruboCopOutput).files[0].offenses;
+  return JSON.parse(ruboCopOutput).files[0]?.offenses || [];
 }
 
 function hasRuboCopYml(directory: string): boolean {

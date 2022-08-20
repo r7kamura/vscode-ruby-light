@@ -59,6 +59,8 @@ export async function runRuboCopLint({
   return toOffenses(result.stdout);
 }
 
+const SEPARATOR = "====================";
+
 export async function runRuboCopAutocorrect({
   code,
   path,
@@ -73,16 +75,15 @@ export async function runRuboCopAutocorrect({
     args.push("--only", copName);
   }
   const result = await runCommandWithOrWithoutBundler("rubocop", args, code);
-  if (result.code && result.stderr) {
+  if (!result.stdout.includes(SEPARATOR)) {
     throw new Error(result.stderr);
   }
   return toCorrectedCode(result.stdout);
 }
 
 function toCorrectedCode(ruboCopOutput: string): string {
-  const separator = "====================";
-  const index = ruboCopOutput.search(new RegExp(`^${separator}$`, "m"));
-  return ruboCopOutput.substring(index + separator.length).trimStart();
+  const index = ruboCopOutput.search(new RegExp(`^${SEPARATOR}$`, "m"));
+  return ruboCopOutput.substring(index + SEPARATOR.length).trimStart();
 }
 
 function toOffenses(ruboCopOutput: string): Array<RuboCopOffense> {

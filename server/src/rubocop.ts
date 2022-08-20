@@ -68,7 +68,7 @@ export async function runRuboCopAutocorrect({
   copName?: string;
   path: string;
 }): Promise<string> {
-  const args = ["--force-exclusion", "--auto-correct-all", "--stdin", path];
+  const args = ["--force-exclusion", "--autocorrect-all", "--stdin", path];
   if (copName) {
     args.push("--only", copName);
   }

@@ -46,5 +46,5 @@ function toCopName(diagnostic: Diagnostic): string {
 }
 
 function toCorrectable(diagnostic: Diagnostic): boolean {
-  return diagnostic.data == null ? false : (diagnostic.data as any).correctable;
+  return (diagnostic.data as any)?.correctable;
 }

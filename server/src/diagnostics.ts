@@ -89,13 +89,6 @@ async function investigateDiagnostics(
   return offenses.map((offense) => toVscodeDiagnostic(offense, uri));
 }
 
-function sendEmptyDiagnostics(uri: DocumentUri, connection: Connection) {
-  connection.sendDiagnostics({
-    uri,
-    diagnostics: [],
-  });
-}
-
 const DIAGNOSTIC_SEVERITIES = new Map<RuboCopSeverity, DiagnosticSeverity>([
   ["convention", DiagnosticSeverity.Information],
   ["error", DiagnosticSeverity.Error],

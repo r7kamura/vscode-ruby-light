@@ -5,8 +5,20 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import * as Parser from "web-tree-sitter";
-import { selfAndAncestors, toRange } from "./node.js";
+import { ConstantReadNode as PrismConstantReadNode } from "@ruby/prism/src/nodes.js";
+import {
+  CallNode,
+  ClassNode,
+  ConstantReadNode,
+  ConstantWriteNode,
+  DefNode,
+  ModuleNode,
+  Node,
+  ProgramNode,
+  SingletonClassNode,
+  StringNode,
+  SymbolNode,
+} from "./nodes.js";
 import { parse } from "./parser.js";
 import { Settings } from "./settings.js";
 
@@ -27,39 +39,41 @@ export function documentSymbolRequestHandler(
   return new Walker().walk(parse(textDocument.getText()));
 }
 
+const FIELD_METHOD_NAMES = new Set([
+  "attr_accessor",
+  "attr_reader",
+  "attr_writer",
+]);
+
+const AVAILABLE_FIELD_NAME_TYPES = new Set(["StringNode", "SymbolNode"]);
+
 class Walker {
   private documentSymbolStack: DocumentSymbol[];
 
   private singletonClassNameStack: string[];
-
-  private FIELD_METHOD_NAMES = new Set([
-    "attr_accessor",
-    "attr_reader",
-    "attr_writer",
-  ]);
 
   constructor() {
     this.documentSymbolStack = [this.createDummyDocumentSymbol()];
     this.singletonClassNameStack = [];
   }
 
-  walk(rootNode: Parser.SyntaxNode): DocumentSymbol[] {
+  walk(rootNode: ProgramNode): DocumentSymbol[] {
     this.step(rootNode);
     return this.documentSymbolStack[0].children!;
   }
 
-  private step(node: Parser.SyntaxNode) {
+  private step(node: Node) {
     const documentSymbols = this.createDocumentSymbols(node);
     const singletonClassName = extractSingletonClassName(node);
     this.pushDocumentSymbols(documentSymbols);
     if (singletonClassName) {
-      this.pushSingletonClassName(singletonClassName);
+      this.singletonClassNameStack.push(singletonClassName);
     }
-    node.children.forEach((child) => {
+    node.children().forEach((child: Node) => {
       this.step(child);
     });
     if (singletonClassName) {
-      this.popSingletonClassName();
+      this.singletonClassNameStack.pop();
     }
     if (documentSymbols.length > 0) {
       this.popDocumentSymbol();
@@ -91,181 +105,168 @@ class Walker {
     }
   }
 
-  private pushSingletonClassName(singletonClassName: string) {
-    this.singletonClassNameStack.push(singletonClassName);
-  }
-
   private popDocumentSymbol() {
     this.documentSymbolStack.pop();
   }
 
-  private popSingletonClassName() {
-    this.singletonClassNameStack.pop();
-  }
-
-  private createDocumentSymbols(node: Parser.SyntaxNode): DocumentSymbol[] {
-    if (!node.isNamed()) {
-      return [];
-    }
-
+  private createDocumentSymbols(node: Node): DocumentSymbol[] {
     switch (node.type) {
-      case "class":
-        return this.createDocumentSymbolsForClass(node);
-      case "call":
-        return this.createDocumentSymbolsForCall(node);
-      case "module":
-        return this.createDocumentSymbolsForModule(node);
-      case "assignment":
-        return this.createDocumentSymbolsForAssignment(node);
-      case "method":
-        return this.createDocumentSymbolsForMethod(node);
-      case "singleton_method":
-        return this.createDocumentSymbolsForSingletonMethod(node);
+      case "ClassNode":
+        return this.createDocumentSymbolsForClassNode(node as ClassNode);
+      case "CallNode":
+        return this.createDocumentSymbolsForCallNode(node as CallNode);
+      case "ConstantWriteNode":
+        return this.createDocumentSymbolsForConstantWriteNode(
+          node as ConstantWriteNode
+        );
+      case "DefNode":
+        return this.createDocumentSymbolsForDefNode(node as DefNode);
+      case "ModuleNode":
+        return this.createDocumentSymbolsForModuleNode(node as ModuleNode);
       default:
         return [];
     }
   }
 
-  private createDocumentSymbolsForAssignment(
-    node: Parser.SyntaxNode
+  private createDocumentSymbolsForConstantWriteNode(
+    node: ConstantWriteNode
   ): DocumentSymbol[] {
-    if (node.firstChild?.type !== "constant") {
-      return [];
-    }
     return [
       {
-        name: fullQualifiedConstantName(node.firstChild!),
+        name: node.name(),
         kind: SymbolKind.Constant,
         children: [],
-        range: toRange(node.firstChild!),
-        selectionRange: toRange(node.firstChild!),
+        range: node.range(),
+        selectionRange: node.nameRange(),
       },
     ];
   }
 
-  private createDocumentSymbolsForClass(
-    node: Parser.SyntaxNode
-  ): DocumentSymbol[] {
+  private createDocumentSymbolsForClassNode(node: ClassNode): DocumentSymbol[] {
     return [
       {
-        name: fullQualifiedConstantName(node),
+        name: node.name(),
         kind: SymbolKind.Class,
         children: [],
-        range: toRange(node),
-        selectionRange: toRange(node.firstNamedChild!),
+        range: node.range(),
+        selectionRange: node.constantPathRange()!,
       },
     ];
   }
 
-  private createDocumentSymbolsForCall(
-    node: Parser.SyntaxNode
-  ): DocumentSymbol[] {
-    if (!this.FIELD_METHOD_NAMES.has(node.firstNamedChild!.text!)) {
+  private createDocumentSymbolsForCallNode(node: CallNode): DocumentSymbol[] {
+    if (!FIELD_METHOD_NAMES.has(node.methodName())) {
       return [];
     }
-
-    const availableArgumentNodeTypes = new Set(["simple_symbol", "string"]);
-    return node
-      .lastChild!.children.filter((node) => {
-        return availableArgumentNodeTypes.has(node.type);
+    const argumentNodes = node.argumentNodes();
+    if (!argumentNodes) {
+      return [];
+    }
+    return argumentNodes
+      .filter((node: Node) => {
+        return AVAILABLE_FIELD_NAME_TYPES.has(node.constructor.name);
       })
-      .map((argumentNode) => {
-        const name =
-          argumentNode.type === "simple_symbol"
-            ? argumentNode.text!.slice(1)
-            : argumentNode.text!.slice(1, -1);
+      .map((node) => {
         return {
-          name,
+          name: (node as StringNode | SymbolNode).unescaped(),
           kind: SymbolKind.Field,
           children: [],
-          range: toRange(node),
-          selectionRange: toRange(argumentNode),
+          range: node.range(),
+          selectionRange: node.range(),
         };
       });
   }
 
-  private createDocumentSymbolsForMethod(
-    node: Parser.SyntaxNode
-  ): DocumentSymbol[] {
+  private createDocumentSymbolsForDefNode(node: DefNode): DocumentSymbol[] {
+    const name = this.methodNameSignature(node);
+    if (!name) {
+      return [];
+    }
     return [
       {
-        name: methodNameSignature(
-          this.singletonClassNameStack[this.singletonClassNameStack.length - 1],
-          node.firstNamedChild!.text
-        ),
+        name,
         kind: SymbolKind.Method,
         children: [],
-        range: toRange(node),
-        selectionRange: toRange(node.firstNamedChild!),
+        range: node.range(),
+        selectionRange: node.nameRange()!,
       },
     ];
   }
 
-  private createDocumentSymbolsForModule(
-    node: Parser.SyntaxNode
+  private createDocumentSymbolsForModuleNode(
+    node: ModuleNode
   ): DocumentSymbol[] {
     return [
       {
-        name: fullQualifiedConstantName(node),
+        name: node.name(),
         kind: SymbolKind.Module,
         children: [],
-        range: toRange(node),
-        selectionRange: toRange(node.firstNamedChild!),
+        range: node.range(),
+        selectionRange: node.constantPathRange()!,
       },
     ];
   }
 
-  private createDocumentSymbolsForSingletonMethod(
-    node: Parser.SyntaxNode
-  ): DocumentSymbol[] {
-    return [
-      {
-        name: methodNameSignature(node.child(1)!.text, node.child(3)!.text),
-        kind: SymbolKind.Method,
-        children: [],
-        range: toRange(node),
-        selectionRange: toRange(node.child(1)!, node.child(3)!),
-      },
-    ];
+  private methodNameSignature(node: DefNode): string | undefined {
+    const methodName = node.name();
+    const receiver = node.receiver();
+    if (receiver) {
+      if (receiver.type === "SelfNode") {
+        return `.${methodName}`;
+      } else if (receiver.type === "ConstantReadNode") {
+        return `${(receiver as ConstantReadNode).name()}.${methodName}`;
+      }
+    } else if (this.singletonClassNameStack.length > 0) {
+      if (
+        this.singletonClassNameStack[
+          this.singletonClassNameStack.length - 1
+        ] === "self"
+      ) {
+        return `.${methodName}`;
+      }
+    } else {
+      return `#${methodName}`;
+    }
   }
 }
 
-function extractSingletonClassName(
-  node: Parser.SyntaxNode
-): string | undefined {
-  if (node.type !== "singleton_class") {
+// NOTE: Only `class << self` is supported for now.
+function extractSingletonClassName(node: Node): string | undefined {
+  if (node.constructor.name !== "SingletonClassNode") {
     return;
   }
-
-  return node.firstNamedChild!.text;
-}
-
-function methodNameSignature(
-  singletonClassName: string | undefined,
-  methodName: string
-): string {
-  if (singletonClassName === "self") {
-    return `.${methodName}`;
-  } else if (singletonClassName) {
-    return `${singletonClassName}.${methodName}`;
+  const castedNode = node as SingletonClassNode;
+  if (castedNode.prismNode.expression.constructor.name === "SelfNode") {
+    return "self";
+  } else if (
+    castedNode.prismNode.expression.constructor.name === "ConstantReadNode"
+  ) {
+    return (castedNode.prismNode.expression as PrismConstantReadNode).name;
   } else {
-    return `#${methodName}`;
+    return "unknown";
   }
 }
 
-function fullQualifiedConstantName(node: Parser.SyntaxNode): string {
-  const moduleNestableTypes = new Set(["class", "constant", "module"]);
-  return selfAndAncestors(node)
+// I can't decide if the constant symbol name should be a fully qualified name or not,
+// so I will leave this implementation for now.
+function fullQualifiedConstantName(node: Node): string {
+  const moduleNestableTypes = new Set([
+    "ClassNode",
+    "ConstantWriteNode",
+    "ModuleNode",
+  ]);
+  return [node, ...node.ancestors()]
     .filter((ancestor) => {
       return moduleNestableTypes.has(ancestor.type);
     })
     .map((ancestor) => {
-      switch (ancestor.type) {
-        case "class":
-        case "module":
-          return ancestor.firstNamedChild!.text;
-        case "constant":
-          return ancestor.text;
+      switch (ancestor.constructor.name) {
+        case "ClassNode":
+          return (ancestor as ClassNode).name();
+        case "ModuleNode":
+          return (ancestor as ModuleNode).name();
+        case "ConstantWriteNode":
+          return (ancestor as ConstantWriteNode).name();
       }
     })
     .reverse()

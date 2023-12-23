@@ -4,7 +4,7 @@
 
 Lightweight VSCode extension for Ruby.
 
-This extension is intended to provide a slightly better editing experience than VSCode's standard features, such as syntax highlighting and cursor manipulation, without requiring users to install Ruby.
+This extension is intended to provide a slightly better editing experience than VSCode's standard features, such as better syntax highlighting and better cursor manipulation, without requiring users to install Ruby.
 
 ## Install
 

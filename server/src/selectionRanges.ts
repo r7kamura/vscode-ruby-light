@@ -5,11 +5,11 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import Parser = require("web-tree-sitter");
-import { currentNode, selfAndAncestors, toRange } from "./node";
-import { parse } from "./parser";
-import Position from "./Position";
-import { Settings } from "./settings";
+import * as Parser from "web-tree-sitter";
+import { currentNode, selfAndAncestors, toRange } from "./node.js";
+import { parse } from "./parser.js";
+import Position from "./Position.js";
+import { Settings } from "./settings.js";
 
 export function selectionRangesRequestHandler(
   settings: Settings,

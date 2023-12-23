@@ -7,8 +7,8 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { commandIdentifierForAutocorrect } from "./executeCommand";
-import { Settings } from "./settings";
+import { commandIdentifierForAutocorrect } from "./executeCommand.js";
+import { Settings } from "./settings.js";
 
 export function codeActionRequestHandler(
   _settings: Settings,

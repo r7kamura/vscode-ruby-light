@@ -6,9 +6,9 @@ import {
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { URI } from "vscode-uri";
-import { runRuboCopAutocorrect } from "./rubocop";
-import { Settings } from "./settings";
-import { fromDiff } from "./textEdit";
+import { runRuboCopAutocorrect } from "./rubocop.js";
+import { Settings } from "./settings.js";
+import { fromDiff } from "./textEdit.js";
 
 export const commandIdentifierForAutocorrect = "RubyLight.Autocorrect";
 

@@ -14,8 +14,8 @@ import {
   RuboCopOffense,
   RuboCopSeverity,
   inRuboCopDirectory,
-} from "./rubocop";
-import { Settings } from "./settings";
+} from "./rubocop.js";
+import { Settings } from "./settings.js";
 
 export async function diagnosticsRequestHandler(
   settings: Settings,

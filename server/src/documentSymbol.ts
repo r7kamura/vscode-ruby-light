@@ -5,10 +5,10 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import Parser = require("web-tree-sitter");
-import { selfAndAncestors, toRange } from "./node";
-import { parse } from "./parser";
-import { Settings } from "./settings";
+import * as Parser from "web-tree-sitter";
+import { selfAndAncestors, toRange } from "./node.js";
+import { parse } from "./parser.js";
+import { Settings } from "./settings.js";
 
 export function documentSymbolRequestHandler(
   settings: Settings,

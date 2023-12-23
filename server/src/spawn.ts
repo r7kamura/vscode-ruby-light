@@ -1,5 +1,5 @@
 import { spawn } from "child_process";
-import { inBundlerDirectory } from "./bundler";
+import { inBundlerDirectory } from "./bundler.js";
 
 export async function runCommandWithOrWithoutBundler(
   command: string,

@@ -1,6 +1,7 @@
 {
   "name": "vscode-ruby-light-server",
   "private": true,
+  "type": "module",
   "dependencies": {
     "diff-match-patch": "^1.0.5",
     "vscode-languageserver": "^7.0.0",

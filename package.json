@@ -14,11 +14,8 @@
   ],
   "publisher": "r7kamura",
   "engines": {
-    "vscode": "^1.63.0"
+    "vscode": "^1.75.0"
   },
-  "activationEvents": [
-    "onLanguage:ruby"
-  ],
   "main": "./client/out/extension",
   "contributes": {
     "configuration": {

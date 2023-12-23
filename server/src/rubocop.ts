@@ -1,7 +1,7 @@
 import { existsSync } from "fs";
-import path = require("path");
-import { currentOrAncestorDirectories } from "./directory";
-import { runCommandWithOrWithoutBundler } from "./spawn";
+import * as path from "path";
+import { currentOrAncestorDirectories } from "./directory.js";
+import { runCommandWithOrWithoutBundler } from "./spawn.js";
 
 export async function inRuboCopDirectory(): Promise<boolean> {
   const directories = await currentOrAncestorDirectories();

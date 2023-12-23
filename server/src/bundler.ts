@@ -1,6 +1,6 @@
 import { existsSync } from "fs";
-import path = require("path");
-import { currentOrAncestorDirectories } from "./directory";
+import * as path from "path";
+import { currentOrAncestorDirectories } from "./directory.js";
 
 export async function inBundlerDirectory(): Promise<boolean> {
   const directories = await currentOrAncestorDirectories();

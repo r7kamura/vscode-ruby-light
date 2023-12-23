@@ -1,5 +1,5 @@
 import { readlink } from "fs/promises";
-import path = require("path");
+import * as path from "path";
 
 export async function currentOrAncestorDirectories(): Promise<Array<string>> {
   const directories = [];

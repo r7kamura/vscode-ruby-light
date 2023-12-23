@@ -1,6 +1,6 @@
 import { Range } from "vscode-languageserver";
-import Parser = require("web-tree-sitter");
-import Position from "./Position";
+import * as Parser from "web-tree-sitter";
+import Position from "./Position.js";
 
 export function ancestors(node: Parser.SyntaxNode): Parser.SyntaxNode[] {
   const ancestors: Parser.SyntaxNode[] = [];

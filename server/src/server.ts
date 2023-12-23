@@ -5,24 +5,24 @@ import {
   ProposedFeatures,
   TextDocuments,
   TextDocumentSyncKind,
-} from "vscode-languageserver/node";
+} from "vscode-languageserver/node.js";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import { initializeParser } from "./parser";
-import { documentHighlightRequestHandler } from "./documentHighlight";
-import { selectionRangesRequestHandler } from "./selectionRanges";
-import { documentSymbolRequestHandler } from "./documentSymbol";
-import { codeActionRequestHandler } from "./codeAction";
-import { documentFormattingRequestHandler } from "./documentFormatting";
+import { initializeParser } from "./parser.js";
+import { documentHighlightRequestHandler } from "./documentHighlight.js";
+import { selectionRangesRequestHandler } from "./selectionRanges.js";
+import { documentSymbolRequestHandler } from "./documentSymbol.js";
+import { codeActionRequestHandler } from "./codeAction.js";
+import { documentFormattingRequestHandler } from "./documentFormatting.js";
 import {
   commandIdentifiers,
   executeCommandRequestHandler,
-} from "./executeCommand";
-import { defaultSettings, getSettings, Settings } from "./settings";
+} from "./executeCommand.js";
+import { defaultSettings, getSettings, Settings } from "./settings.js";
 import {
   diagnosticsRequestHandler,
   refreshAllDocumentsDiagnostics,
-} from "./diagnostics";
-import { documentRangeFormattingRequestHandler } from "./documentRangeFormatting";
+} from "./diagnostics.js";
+import { documentRangeFormattingRequestHandler } from "./documentRangeFormatting.js";
 
 const connection = createConnection(ProposedFeatures.all);
 

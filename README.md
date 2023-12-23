@@ -1,6 +1,6 @@
 # vscode-ruby-light
 
-[![build](https://github.com/r7kamura/vscode-ruby-light/actions/workflows/build.yml/badge.svg)](https://github.com/r7kamura/vscode-ruby-light/actions/workflows/build.yml)
+[![build](https://github.com/r7kamura/vscode-ruby-light/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/r7kamura/vscode-ruby-light/actions/workflows/build.yml)
 
 Lightweight VSCode extension for Ruby.
 

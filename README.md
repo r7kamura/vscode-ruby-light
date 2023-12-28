@@ -100,5 +100,3 @@ Enable document symbol.
 ## Acknowledgements
 
 This extension is inspired by [vscode-ruby](https://github.com/rubyide/vscode-ruby).
-
-As another project, we are developing a Ruby Language Server called [Rucoa](https://github.com/r7kamura/rucoa).

@@ -1,0 +1,19 @@
+name: bump-request
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to change to.
+        required: true
+        type: string
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: r7kamura/bump-request@v0
+        with:
+          command: |
+            npm version --no-git-commit-hooks --no-git-tag-version "${{ inputs.version }}"
+          version: ${{ inputs.version }}

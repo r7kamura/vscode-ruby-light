@@ -99,4 +99,5 @@ Enable document symbol.
 
 ## Acknowledgements
 
-This extension is inspired by [vscode-ruby](https://github.com/rubyide/vscode-ruby).
+- Inspired by [rubyide/vscode-ruby](https://github.com/rubyide/vscode-ruby)
+- Powered by [ruby/prism](https://github.com/ruby/prism)'s Ruby parser

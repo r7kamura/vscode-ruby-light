@@ -4,7 +4,7 @@
   "description": "Lightweight VSCode extension for Ruby.",
   "author": "r7kamura",
   "license": "MIT",
-  "version": "0.5.2",
+  "version": "0.6.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/r7kamura/vscode-ruby-light.git"

@@ -12,7 +12,11 @@ Install via Visual Studio Marketplace:
 
 - [Ruby Light - Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=r7kamura.vscode-ruby-light)
 
-For Diagnostics and Formatting features, `rubocop` must be available in the workspace. If `Gemfile` exists in the current or ancestor directory, `bundle exec rubocop` is used instead. For the other features, there is no need to install anything additional.
+### Optional configuration
+
+If you want to use Diagnostics and Formatting features, `rubocop` must be available in your VSCode workspace. If `Gemfile` exists in the workspace or any ancestor directory, `bundle exec rubocop` is used instead. For the other features, there is no need to install anything additional.
+
+If you want to partially disable any of the features provided by this extension, you can do so in the Settings menu.
 
 ## Features
 

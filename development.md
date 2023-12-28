@@ -32,12 +32,12 @@ See the [official docs](https://code.visualstudio.com/api/language-extensions/la
 ## Local installation
 
 ```
-npx vsce package
+npx @vscode/vsce package
 code --install-extension vscode-ruby-light-*.vsix
 ```
 
 ## Publish
 
 ```
-npx vsce publish
+npx @vscode/vsce publish
 ```

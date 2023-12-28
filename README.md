@@ -96,8 +96,3 @@ Enable selection ranges.
 Enable document symbol.
 
 - default: `true`
-
-## Acknowledgements
-
-- Inspired by [rubyide/vscode-ruby](https://github.com/rubyide/vscode-ruby)
-- Powered by [ruby/prism](https://github.com/ruby/prism)'s Ruby parser

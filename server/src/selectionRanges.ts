@@ -5,11 +5,10 @@ import {
   TextDocuments,
 } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
-import * as Parser from "web-tree-sitter";
-import { currentNode, selfAndAncestors, toRange } from "./node.js";
+import { ArrayNode, CallNode, Node, StringNode } from "./nodes.js";
 import { parse } from "./parser.js";
-import Position from "./Position.js";
 import { Settings } from "./settings.js";
+import Location from "./Location.js";
 
 export function selectionRangesRequestHandler(
   settings: Settings,
@@ -25,111 +24,90 @@ export function selectionRangesRequestHandler(
     return;
   }
 
-  const rootNode = parse(textDocument.getText());
-  return params.positions.map(Position.fromVscodePosition).map((position) => {
-    return toSelectionRange(currentNode(rootNode, position));
+  const source = textDocument.getText();
+  return params.positions.map((position) => {
+    return toSelectionRange(
+      parse(source).descendantForLocation(
+        Location.fromPosition(source, position)
+      )
+    );
   });
 }
 
-function toRanges(node: Parser.SyntaxNode): Range[] {
+function toRanges(node: Node): Range[] {
   switch (node.type) {
-    case "string":
-    case "string_array":
-    case "symbol_array":
-      return toInnerAndOuterRanges(node);
-    case "element_reference":
-      return toElementReferenceRanges(node);
-    case "do":
-      return toDoRanges(node);
-    case "argument_list":
-      return toArgumentListRanges(node);
+    case "ArrayNode":
+      return toArrayNodeRanges(node as ArrayNode);
+    case "CallNode":
+      return toCallNodeRanges(node as CallNode);
+    case "StringNode":
+      return toStringNodeRanges(node as StringNode);
     default:
-      return [toRange(node)];
+      return [node.range()];
   }
 }
 
-// To ignore do nodes of do-less `while` and do-less `until`.
-function toDoRanges(node: Parser.SyntaxNode): Range[] {
-  if (isDoLessDo(node)) {
-    return [];
-  } else {
-    return [toRange(node)];
-  }
-}
-
-// a(b, c)
-//   ^^^^
-//  ^^^^^^
-//
-// a b, c
-//   ^^^^
-function toArgumentListRanges(node: Parser.SyntaxNode): Range[] {
-  if (isParenthesesLessArgumentList(node)) {
-    return [toRange(node)];
-  } else {
-    return toInnerAndOuterRanges(node);
-  }
-}
-
-// Set[:a, :b, :c]
-//     ^^^^^^^^^^
-//    ^^^^^^^^^^^^
-// ^^^^^^^^^^^^^^^
-function toElementReferenceRanges(node: Parser.SyntaxNode): Range[] {
-  return [
-    Range.create(
-      Position.fromTreeSitterPosition(
-        node.children[1]!.endPosition
-      ).toVscodePosition(),
-      Position.fromTreeSitterPosition(
-        node.lastChild!.startPosition
-      ).toVscodePosition()
-    ),
-    Range.create(
-      Position.fromTreeSitterPosition(
-        node.children[1]!.startPosition
-      ).toVscodePosition(),
-      Position.fromTreeSitterPosition(
-        node.lastChild!.endPosition
-      ).toVscodePosition()
-    ),
-    toRange(node),
-  ];
-}
-
-// %q(a b c)
-//    ^^^^^
+// [a, b, c]
+//  ^^^^^^^
 // ^^^^^^^^^
-function toInnerAndOuterRanges(node: Parser.SyntaxNode): Range[] {
-  return [toInnerRange(node), toRange(node)];
+function toArrayNodeRanges(node: ArrayNode): Range[] {
+  return [node.elementsRange(), node.range()].filter(
+    (range) => range
+  ) as Range[];
 }
 
-function toInnerRange(node: Parser.SyntaxNode): Range {
-  return Range.create(
-    Position.fromTreeSitterPosition(
-      node.firstChild!.endPosition
-    ).toVscodePosition(),
-    Position.fromTreeSitterPosition(
-      node.lastChild!.startPosition
-    ).toVscodePosition()
-  );
+// foo(a, b, c)
+//     ^^^^^^^
+//    ^^^^^^^^^
+// ^^^^^^^^^^^^
+function toCallNodeRanges(node: CallNode): Range[] {
+  return [
+    node.argumentsRange(),
+    node.openingToClosingRange(),
+    node.range(),
+  ].filter((range) => range) as Range[];
 }
 
-function toSelectionRange(node: Parser.SyntaxNode): SelectionRange {
+// "a b c"
+//  ^^^^^
+// ^^^^^^^
+function toStringNodeRanges(node: StringNode): Range[] {
+  return [node.contentRange(), node.openingToClosingRange()].filter(
+    (range) => range
+  ) as Range[];
+}
+
+function toSelectionRange(node: Node): SelectionRange {
+  const ranges = [node, ...node.ancestors()]
+    .map((node) => node)
+    .flatMap(toRanges);
+  const rangesIncludingCurrentNode: Range[] = [];
+  ranges.forEach((range) => {
+    if (
+      rangesIncludingCurrentNode.length === 0 ||
+      isRangeContained(
+        range,
+        rangesIncludingCurrentNode[rangesIncludingCurrentNode.length - 1]
+      )
+    ) {
+      rangesIncludingCurrentNode.push(range);
+    }
+  });
+
   let result: SelectionRange;
-  selfAndAncestors(node)
-    .flatMap(toRanges)
-    .reverse()
-    .forEach((range) => {
-      result = { range, parent: result };
-    });
+  rangesIncludingCurrentNode.reverse().forEach((range) => {
+    result = { range, parent: result };
+  });
   return result!;
 }
 
-function isParenthesesLessArgumentList(node: Parser.SyntaxNode): boolean {
-  return node.type === "argument_list" && node.firstChild?.type !== "(";
-}
-
-function isDoLessDo(node: Parser.SyntaxNode): boolean {
-  return node.type === "do" && node.firstChild?.type !== "do";
+function isRangeContained(outer: Range, inner: Range): boolean {
+  return (
+    (outer.start.line < inner.start.line ||
+      (outer.start.line === inner.start.line &&
+        outer.start.character <= inner.start.character)) &&
+    (outer.end.line > inner.end.line ||
+      (outer.end.line === inner.end.line &&
+        outer.end.character >= inner.end.character))
+  );
 }

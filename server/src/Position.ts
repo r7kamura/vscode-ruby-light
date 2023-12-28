@@ -1,5 +1,10 @@
-import { Point as TreeSitterPosition } from "web-tree-sitter";
 import { Position as VscodePosition } from "vscode-languageserver";
+
+// FIXME: This is a temporary workaround for migration from tree-sitter to prism.
+type TreeSitterPosition = {
+  row: number;
+  column: number;
+};
 
 export default class Position {
   private row: number;

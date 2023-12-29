@@ -21,13 +21,13 @@ npm run compile
 
 ## Run
 
-Launch VSCode workspace, then press <kbd>F5</kbd> to launch a new Extension Development Host instance.
+Launch VSCode workspace:
 
 ```
 code .
 ```
 
-See the [official docs](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for more details.
+Then press <kbd>F5</kbd> to launch a new Extension Development Host instance. See the [VSCode official docs](https://code.visualstudio.com/api/language-extensions/language-server-extension-guide) for more details.
 
 ## Local installation
 

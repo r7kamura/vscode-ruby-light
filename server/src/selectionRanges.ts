@@ -90,8 +90,8 @@ function toSelectionRange(node: Node): SelectionRange {
   const ranges = [node, ...node.ancestors()]
     .map((node) => node)
     .flatMap(toRanges);
-
-  // Sort ranges by size (smallest first) to ensure proper nesting
+  
+  // Sort ranges by their byte size (smallest first) to ensure proper nesting
   const sortedRanges = ranges.sort((a, b) => {
     const aSize = getRangeSize(a, node.source);
     const bSize = getRangeSize(b, node.source);
@@ -102,9 +102,9 @@ function toSelectionRange(node: Node): SelectionRange {
   sortedRanges.forEach((range) => {
     if (
       rangesIncludingCurrentNode.length === 0 ||
-      isRangeContained(
-        range,
-        rangesIncludingCurrentNode[rangesIncludingCurrentNode.length - 1]
+      !isRangeContained(
+        rangesIncludingCurrentNode[rangesIncludingCurrentNode.length - 1],
+        range
       )
     ) {
       rangesIncludingCurrentNode.push(range);

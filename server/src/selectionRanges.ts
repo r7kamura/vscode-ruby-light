@@ -90,7 +90,7 @@ function toSelectionRange(node: Node): SelectionRange {
   const ranges = [node, ...node.ancestors()]
     .map((node) => node)
     .flatMap(toRanges);
-  
+
   // Sort ranges by their byte size (smallest first) to ensure proper nesting
   const sortedRanges = ranges.sort((a, b) => {
     const aSize = getRangeSize(a, node.source);

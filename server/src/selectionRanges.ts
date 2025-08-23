@@ -77,6 +77,15 @@ function toStringNodeRanges(node: StringNode): Range[] {
   ) as Range[];
 }
 
+function getRangeSize(range: Range, source: string): number {
+  // Convert positions to actual byte offsets in the source text
+  const startOffset = Location.fromPosition(source, range.start).startOffset;
+  const endOffset = Location.fromPosition(source, range.end).startOffset;
+
+  // Return the actual text length between positions
+  return endOffset - startOffset;
+}
+
 function toSelectionRange(node: Node): SelectionRange {
   const ranges = [node, ...node.ancestors()]
     .map((node) => node)
@@ -84,12 +93,8 @@ function toSelectionRange(node: Node): SelectionRange {
 
   // Sort ranges by size (smallest first) to ensure proper nesting
   const sortedRanges = ranges.sort((a, b) => {
-    const aSize =
-      (a.end.line - a.start.line) * 1000 +
-      (a.end.character - a.start.character);
-    const bSize =
-      (b.end.line - b.start.line) * 1000 +
-      (b.end.character - b.start.character);
+    const aSize = getRangeSize(a, node.source);
+    const bSize = getRangeSize(b, node.source);
     return aSize - bSize;
   });
 
